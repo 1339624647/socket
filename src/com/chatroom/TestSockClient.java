@@ -7,11 +7,11 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class TestSockClient {
-public static void main(String[] args) {
+	static DataInputStream dis = null;
+    public static void main(String[] args) {
 	DataOutputStream dos = null;
-	DataInputStream dis = null;
 	Socket socket = null;
-	String s=null;
+	
 	String str=null;
 	Scanner input=new Scanner(System.in);
 	try {
@@ -20,11 +20,23 @@ public static void main(String[] args) {
 			dos = new DataOutputStream(socket.getOutputStream());
 			dis = new DataInputStream(socket.getInputStream());
 			//客户端向服务器发送内容
+			//匿名内部类 另起一个线程作输出  子线程
+			new Thread(){
+				@Override
+				public void run() {
+					String s=null;
+					try {
+						if ((s = dis.readUTF()) != null) 
+							System.out.println(s);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				};
+			}.start();
+			//主线程
 			str=input.nextLine();
 			dos.writeUTF(str);
-			if ((s = dis.readUTF()) != null) {
-				System.out.println(s);
-			}
 		} while (!str.equals("88"));
 		System.out.println("server over!");
 	} catch (Exception e) {
