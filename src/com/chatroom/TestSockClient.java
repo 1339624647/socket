@@ -11,12 +11,11 @@ public class TestSockClient {
     public static void main(String[] args) {
 	DataOutputStream dos = null;
 	Socket socket = null;
-	
 	String str=null;
 	Scanner input=new Scanner(System.in);
 	try {
 		socket=new Socket("127.0.0.1", 8888);
-		do {
+		System.out.println("客户端已连接！");
 			dos = new DataOutputStream(socket.getOutputStream());
 			dis = new DataInputStream(socket.getInputStream());
 			//客户端向服务器发送内容
@@ -26,21 +25,25 @@ public class TestSockClient {
 				public void run() {
 					String s=null;
 					try {
+						while(true){
 						if ((s = dis.readUTF()) != null) 
 							System.out.println(s);
+						}
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						//忽略异常
+						//e.printStackTrace();
 					}
 				};
 			}.start();
 			//主线程
+			do {
 			str=input.nextLine();
 			dos.writeUTF(str);
 		} while (!str.equals("88"));
-		System.out.println("server over!");
+		System.out.println("client over!");
 	} catch (Exception e) {
-		// TODO: handle exception
+		e.printStackTrace();
 	}finally {
 		try {
 			dis.close();

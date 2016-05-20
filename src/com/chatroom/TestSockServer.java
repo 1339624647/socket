@@ -9,22 +9,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TestSockServer {
-	//定义集合存储通道
-	static List<Clinet>clientList=new ArrayList<Clinet>();
+	// 定义集合存储通道
+	static List<Clinet> clientList = new ArrayList<Clinet>();
+
 	public static void main(String[] args) {
 		Socket socket = null;
 
 		try {
 			// 准备
 			ServerSocket s = new ServerSocket(8888);
-			System.out.println("服务器启动");
+			System.out.println("服务器启动!");
 			// 连接
 			// socket = s.accept();
 			// 信息交互
 			while (true) {
 				socket = s.accept();
-				//调用Clinet()的带参构造方法
-				Clinet c=new TestSockServer().new Clinet(socket);
+				// 调用Clinet()的带参构造方法
+				Clinet c = new TestSockServer().new Clinet(socket);
 				clientList.add(c);
 				c.start();
 			}
@@ -33,7 +34,8 @@ public class TestSockServer {
 			System.out.println("server over!");
 		}
 	}
-//内部类
+
+	// 内部类
 	class Clinet extends Thread {
 		DataOutputStream dos = null;
 		DataInputStream dis = null;
@@ -46,22 +48,25 @@ public class TestSockServer {
 		@Override
 		public void run() {
 			try {
+				dos = new DataOutputStream(socket.getOutputStream());
+				dis = new DataInputStream(socket.getInputStream());
 				while (true) {
-					
-					dos = new DataOutputStream(socket.getOutputStream());
-					dis = new DataInputStream(socket.getInputStream());
+
 					String str = null;
 					if ((str = dis.readUTF()) != null) {
 						System.out.println("客户端说：" + str);
 					}
-					//dos.writeUTF(socket.getPort() + "说：" + str);
+					// dos.writeUTF(socket.getPort() + "说：" + str);
 					for (int i = 0; i < clientList.size(); i++) {
-						                        //提取客户端i的socket
-						new DataOutputStream(clientList.get(i).socket.getOutputStream()).writeUTF(socket.getPort() + "说：" + str);
+						// 提取客户端i的socket
+						new DataOutputStream(clientList.get(i).socket.getOutputStream())
+								.writeUTF(socket.getPort() + "说：" + str);
 					}
 				}
 			} catch (Exception e) {
-				// TODO: handle exception
+				System.out.println("客户端" + socket.getPort() + "退出");
+				clientList.remove(this);
+				//e.printStackTrace();
 			} finally {
 				try {
 					dis.close();
